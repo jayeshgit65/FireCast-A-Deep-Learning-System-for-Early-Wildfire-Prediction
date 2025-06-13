@@ -6,42 +6,43 @@ import tensorflow as tf
 from tensorflow.keras.models import load_model
 
 # Load models
-cnn_model = load_model(r"C:\Users\lenovo\Documents\Projects\Wildlife_Prediction\wildfire_cnn_best_model.h5")
-resnet_model = load_model(r"C:\Users\lenovo\Documents\Projects\Wildlife_Prediction\wildfire_resnet50_best_model.h5")
+cnn_model = load_model(r"C:\Users\lenovo\Documents\Projects\Wildlife_Prediction\models\wildfire_cnn_best_model.h5")
+resnet_model = load_model(r"C:\Users\lenovo\Documents\Projects\Wildlife_Prediction\models\wildfire_resnet50_best_model.h5")
 class_names = ['No Wildfire', 'Wildfire']
 
-def preprocess_image(image_path, size=(128, 128)):
-    image = cv2.imread(image_path)
-    if image is not None:
-        image = cv2.resize(image, size)
-        image = image / 255.0  # Normalize
-        return np.expand_dims(image, axis=0)
-    return None
+def preprocess_image(image, size=(128, 128)):
+    image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)  # Convert PIL image to OpenCV format
+    image = cv2.resize(image, size)
+    image = image / 255.0  # Normalize
+    return np.expand_dims(image, axis=0)
 
 # Streamlit UI
-st.title("Wildfire Image Classifier")
+st.set_page_config(page_title="Wildfire Image Classifier", layout="centered")
+st.title("🌲 Wildfire Image Classifier")
 st.write("Upload an image to classify it as **Wildfire** or **No Wildfire**.")
 
-model_choice = st.radio("Choose Model", ["Custom CNN", "ResNet50"])
+model_choice = st.radio("Choose Model", ["Custom CNN", "ResNet50"], index=0)
 
 uploaded_file = st.file_uploader("Upload satellite/fire image...", type=["jpg", "jpeg", "png"])
 
-if uploaded_file:
-    temp_path = "temp_fire_image.jpg"
-    with open(temp_path, "wb") as f:
-        f.write(uploaded_file.getbuffer())
-
-    st.image(Image.open(temp_path), caption="Uploaded Image", use_column_width=True)
+if uploaded_file is not None:
+    # Display the uploaded image
+    image = Image.open(uploaded_file)
+    st.image(image, caption="Uploaded Image", use_column_width=True)
     st.write("Processing...")
 
-    preprocessed = preprocess_image(temp_path)
+    # Preprocess the image
+    preprocessed = preprocess_image(image)
     if preprocessed is not None:
         model = cnn_model if model_choice == "Custom CNN" else resnet_model
         pred = model.predict(preprocessed)
         label = 1 if pred >= 0.5 else 0
         confidence = float(pred[0][0]) * 100 if label == 1 else (1 - float(pred[0][0])) * 100
 
+        # Display the prediction results
         st.success(f"**Prediction:** {class_names[label]}")
         st.info(f"**Confidence:** {confidence:.2f}%")
     else:
-        st.error("Failed to read or preprocess the image.")
+        st.error("Failed to preprocess the image.")
+else:
+    st.warning("Please upload an image to get a prediction.")
