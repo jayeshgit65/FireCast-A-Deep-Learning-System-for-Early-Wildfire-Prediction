@@ -4,10 +4,12 @@ import cv2
 from PIL import Image
 import tensorflow as tf
 from tensorflow.keras.models import load_model
+import os
 
 # Load models
-cnn_model = load_model(r"C:\Users\lenovo\Documents\Projects\Wildlife_Prediction\models\wildfire_cnn_best_model.h5")
-resnet_model = load_model(r"C:\Users\lenovo\Documents\Projects\Wildlife_Prediction\models\wildfire_resnet50_best_model.h5")
+cnn_model = load_model(os.path.join("models", "wildfire_cnn_best_model.h5"))
+resnet_model = load_model(os.path.join("models", "wildfire_resnet50_best_model.h5"))
+
 class_names = ['No Wildfire', 'Wildfire']
 
 def preprocess_image(image, size=(128, 128)):
