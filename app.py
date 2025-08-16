@@ -20,8 +20,8 @@ def preprocess_image(image, size=(128, 128)):
 
 # Streamlit UI
 st.set_page_config(page_title="Wildfire Image Classifier", layout="centered")
-st.title("🌲 Wildfire Image Classifier")
-st.write("Upload an image to classify it as **Wildfire** or **No Wildfire**.")
+st.title("🌲 Wildfire Predication")
+st.write("Upload an image to predict **wildfire**")
 
 model_choice = st.radio("Choose Model", ["Custom CNN", "ResNet50"], index=0)
 
