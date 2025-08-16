@@ -1,2 +1,3 @@
 Data/
-models/
+models/wildfire_cnn_final_model.h5
+models/wildfire_resnet50_final_model.h5
